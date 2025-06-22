@@ -1,0 +1,683 @@
+<!-- Adicionando recursos para PWA -->
+<link rel="manifest" href="#manifest-placeholder">
+<meta name="theme-color" content="#4f46e5">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSI1MCIgZmlsbD0iIzRmNDZlNSIvPjxwYXRoIGQ9Ik0zNjIgMTcwSDIzMGMtNi42IDAtMTItNS40LTEyLTEydi0xMmMwLTYuNiA1LjQtMTIgMTItMTJoMTMyYzYuNiAwIDEyIDUuNCAxMiAxMnYxMmMwIDYuNi01LjQgMTItMTIgMTJ6TTM2MiAyNTBIMTUwYy02LjYgMC0xMi01LjQtMTItMTJ2LTEyYzAtNi42IDUuNC0xMiAxMi0xMmgyMTJjNi42IDAgMTIgNS40IDEyIDEydjEyYzAgNi42LTUuNCAxMi0xMiAxMnpNMzYyIDMzMEgxNTBjLTYuNiAwLTEyLTUuNC0xMi0xMnYtMTJjMC02LjYgNS40LTEyIDEyLTEyaDIxMmM2LjYgMCAxMiA1LjQgMTIgMTJ2MTJjMCA2LjYtNS40IDEyLTEyIDEyeiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=">
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8f9fa;
+        overscroll-behavior-y: contain;
+    }
+    
+    .note-card {
+        transition: all 0.3s ease;
+    }
+    
+    .note-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .tag {
+        transition: all 0.2s ease;
+    }
+    
+    .tag:hover {
+        transform: scale(1.05);
+    }
+    
+    .editor-container {
+        min-height: 300px;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .toolbar button {
+        transition: all 0.2s;
+    }
+    
+    .toolbar button:hover {
+        background-color: #e5e7eb;
+    }
+    
+    .sidebar {
+        transition: width 0.3s ease;
+    }
+    
+    @media (max-width: 768px) {
+        .sidebar.collapsed {
+            width: 0;
+            overflow: hidden;
+        }
+    }
+    
+    /* Melhorias para experiência mobile */
+    @media (max-width: 640px) {
+        .toolbar {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .editor-container {
+            min-height: 200px;
+        }
+        
+        .note-card {
+            margin-bottom: 12px;
+        }
+    }
+    
+    /* Remover highlight ao tocar em elementos no mobile */
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Estilo para o botão de instalação */
+    #install-button {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        padding: 12px 16px;
+        background-color: #4f46e5;
+        color: white;
+        border-radius: 50px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
+        <button id="new-note-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg mb-6 flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors">
+            <i class="fas fa-plus"></i>
+            <span>Nova Nota</span>
+        </button>
+        
+        <div class="mb-6">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">PASTAS</h2>
+            <ul class="space-y-1">
+                <li><a href="#" class="flex items-center text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-100 active bg-gray-100"><i class="fas fa-inbox mr-3 text-indigo-500"></i> Todas as Notas</a></li>
+                <li><a href="#" class="flex items-center text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-100"><i class="fas fa-star mr-3 text-yellow-500"></i> Favoritas</a></li>
+                <li><a href="#" class="flex items-center text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-100"><i class="fas fa-tasks mr-3 text-green-500"></i> Tarefas</a></li>
+                <li><a href="#" class="flex items-center text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-100"><i class="fas fa-archive mr-3 text-gray-500"></i> Arquivadas</a></li>
+            </ul>
+        </div>
+        
+        <div>
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 flex justify-between items-center">
+                <span>ETIQUETAS</span>
+                <button class="text-indigo-600 hover:text-indigo-800"><i class="fas fa-plus"></i></button>
+            </h2>
+            <div class="flex flex-wrap gap-2">
+                <span class="tag px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs cursor-pointer">#importante</span>
+                <span class="tag px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs cursor-pointer">#trabalho</span>
+                <span class="tag px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs cursor-pointer">#pessoal</span>
+                <span class="tag px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs cursor-pointer">#ideias</span>
+                <span class="tag px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs cursor-pointer">#projetos</span>
+            </div>
+        </div>
+        
+        <div class="mt-auto pt-6">
+            <button class="flex items-center text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-100 w-full">
+                <i class="fas fa-cog mr-3"></i>
+                <span>Configurações</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top Bar -->
+        <div class="bg-white shadow-sm p-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <button id="mobile-sidebar-toggle" class="md:hidden mr-4 text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="relative">
+                    <input type="text" placeholder="Pesquisar notas..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-64">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button id="view-toggle" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button id="sort-button" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-sort"></i>
+                </button>
+                <div class="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-medium cursor-pointer">
+                    US
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content Area -->
+        <div class="flex-1 overflow-auto p-4" id="notes-container">
+            <!-- Notes Grid View -->
+            <div id="notes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Note cards will be dynamically generated here -->
+            </div>
+            
+            <!-- Note Editor (Hidden by default) -->
+            <div id="note-editor" class="hidden bg-white rounded-lg shadow-md p-4 max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <input type="text" id="note-title" placeholder="Título da nota" class="text-xl font-bold focus:outline-none w-full">
+                    <div class="flex space-x-2">
+                        <button class="text-gray-500 hover:text-yellow-500" id="favorite-btn">
+                            <i class="far fa-star"></i>
+                        </button>
+                        <button class="text-gray-500 hover:text-red-500" id="delete-btn">
+                            <i class="far fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="toolbar flex flex-wrap gap-2 p-2 bg-gray-50 rounded-t-lg border border-gray-200">
+                    <button class="p-1 rounded" data-command="bold"><i class="fas fa-bold"></i></button>
+                    <button class="p-1 rounded" data-command="italic"><i class="fas fa-italic"></i></button>
+                    <button class="p-1 rounded" data-command="underline"><i class="fas fa-underline"></i></button>
+                    <button class="p-1 rounded" data-command="strikeThrough"><i class="fas fa-strikethrough"></i></button>
+                    <span class="border-r border-gray-300 mx-1 h-6"></span>
+                    <button class="p-1 rounded" data-command="justifyLeft"><i class="fas fa-align-left"></i></button>
+                    <button class="p-1 rounded" data-command="justifyCenter"><i class="fas fa-align-center"></i></button>
+                    <button class="p-1 rounded" data-command="justifyRight"><i class="fas fa-align-right"></i></button>
+                    <span class="border-r border-gray-300 mx-1 h-6"></span>
+                    <button class="p-1 rounded" data-command="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
+                    <button class="p-1 rounded" data-command="insertOrderedList"><i class="fas fa-list-ol"></i></button>
+                    <button class="p-1 rounded" data-command="createLink"><i class="fas fa-link"></i></button>
+                    <span class="border-r border-gray-300 mx-1 h-6"></span>
+                    <select class="text-sm border rounded p-1" data-command="formatBlock">
+                        <option value="p">Parágrafo</option>
+                        <option value="h1">Título 1</option>
+                        <option value="h2">Título 2</option>
+                        <option value="h3">Título 3</option>
+                        <option value="blockquote">Citação</option>
+                    </select>
+                    <select class="text-sm border rounded p-1" data-command="fontName">
+                        <option value="Arial">Arial</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                </div>
+                
+                <div class="editor-container border border-gray-200 border-t-0 rounded-b-lg p-4" contenteditable="true" id="note-content"></div>
+                
+                <div class="mt-4 flex justify-between items-center">
+                    <div class="flex flex-wrap gap-2" id="note-tags">
+                        <span class="tag px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs cursor-pointer flex items-center">
+                            #trabalho
+                            <i class="fas fa-times ml-1"></i>
+                        </span>
+                        <button class="px-3 py-1 border border-dashed border-gray-300 rounded-full text-xs text-gray-500 hover:bg-gray-50">
+                            + Adicionar etiqueta
+                        </button>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <button class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg" id="cancel-edit">Cancelar</button>
+                        <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700" id="save-note">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botão de instalação do PWA -->
+<button id="install-button" class="flex items-center gap-2">
+    <i class="fas fa-download"></i>
+    <span>Instalar App</span>
+</button>
+
+<script>
+    // Sample data for notes
+    const sampleNotes = [
+        {
+            id: 1,
+            title: "Reunião de Projeto",
+            content: "<p>Pontos importantes para discutir na reunião de amanhã:</p><ul><li>Cronograma do projeto</li><li>Distribuição de tarefas</li><li>Orçamento atualizado</li></ul>",
+            color: "bg-blue-50",
+            tags: ["trabalho", "projetos"],
+            date: "2023-10-15",
+            isFavorite: true
+        },
+        {
+            id: 2,
+            title: "Lista de Compras",
+            content: "<p>Itens para comprar no supermercado:</p><ul><li>Leite</li><li>Pão</li><li>Ovos</li><li>Frutas</li><li>Legumes</li></ul>",
+            color: "bg-green-50",
+            tags: ["pessoal"],
+            date: "2023-10-16",
+            isFavorite: false
+        },
+        {
+            id: 3,
+            title: "Ideias para o Novo Projeto",
+            content: "<p>Algumas ideias iniciais para o novo projeto:</p><ol><li>Implementar sistema de notificações</li><li>Melhorar a interface do usuário</li><li>Adicionar recursos de acessibilidade</li></ol>",
+            color: "bg-purple-50",
+            tags: ["trabalho", "ideias"],
+            date: "2023-10-14",
+            isFavorite: true
+        },
+        {
+            id: 4,
+            title: "Metas Pessoais",
+            content: "<p><strong>Metas para este mês:</strong></p><ul><li>Ler 2 livros</li><li>Exercícios 3x por semana</li><li>Aprender uma nova habilidade</li></ul>",
+            color: "bg-yellow-50",
+            tags: ["pessoal", "importante"],
+            date: "2023-10-10",
+            isFavorite: false
+        },
+        {
+            id: 5,
+            title: "Lembretes Importantes",
+            content: "<p>Não esquecer:</p><ul><li>Consulta médica dia 20/10</li><li>Aniversário da mãe dia 25/10</li><li>Prazo do relatório dia 22/10</li></ul>",
+            color: "bg-red-50",
+            tags: ["importante", "pessoal"],
+            date: "2023-10-12",
+            isFavorite: true
+        }
+    ];
+
+    // DOM Elements
+    const notesGrid = document.getElementById('notes-grid');
+    const noteEditor = document.getElementById('note-editor');
+    const noteTitleInput = document.getElementById('note-title');
+    const noteContentEditor = document.getElementById('note-content');
+    const newNoteBtn = document.getElementById('new-note-btn');
+    const saveNoteBtn = document.getElementById('save-note');
+    const cancelEditBtn = document.getElementById('cancel-edit');
+    const favoriteBtn = document.getElementById('favorite-btn');
+    const deleteBtn = document.getElementById('delete-btn');
+    const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const viewToggleBtn = document.getElementById('view-toggle');
+    const sortButton = document.getElementById('sort-button');
+    const installButton = document.getElementById('install-button');
+
+    // Current state
+    let currentNoteId = null;
+    let isGridView = true;
+    let sortOrder = 'newest'; // 'newest', 'oldest', 'alphabetical'
+    let notes = [];
+    let deferredPrompt;
+
+    // Initialize the app
+    function init() {
+        // Carregar notas do localStorage ou usar as notas de exemplo
+        const savedNotes = localStorage.getItem('notafacil_notes');
+        if (savedNotes) {
+            notes = JSON.parse(savedNotes);
+        } else {
+            notes = [...sampleNotes];
+            saveNotesToStorage();
+        }
+        
+        renderNotes();
+        setupEventListeners();
+        setupPWA();
+    }
+
+    // Salvar notas no localStorage
+    function saveNotesToStorage() {
+        localStorage.setItem('notafacil_notes', JSON.stringify(notes));
+    }
+
+    // Render all notes in the grid
+    function renderNotes() {
+        notesGrid.innerHTML = '';
+        
+        if (notes.length === 0) {
+            notesGrid.innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center py-16 text-gray-500">
+                    <i class="fas fa-sticky-note text-5xl mb-4"></i>
+                    <h3 class="text-xl font-medium mb-2">Nenhuma nota encontrada</h3>
+                    <p class="mb-4">Crie uma nova nota para começar</p>
+                    <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition-colors">
+                        <i class="fas fa-plus"></i>
+                        <span>Nova Nota</span>
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        notes.forEach(note => {
+            const noteCard = document.createElement('div');
+            noteCard.className = `note-card ${note.color} rounded-lg shadow-sm p-4 cursor-pointer`;
+            noteCard.dataset.id = note.id;
+            
+            const truncatedContent = note.content.replace(/<[^>]*>/g, ' ').substring(0, 100) + (note.content.length > 100 ? '...' : '');
+            
+            noteCard.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-lg font-semibold">${note.title}</h3>
+                    <i class="fas ${note.isFavorite ? 'fa-star text-yellow-500' : 'fa-star text-gray-300'}"></i>
+                </div>
+                <div class="text-gray-600 text-sm mb-3 line-clamp-3">${truncatedContent}</div>
+                <div class="flex flex-wrap gap-1 mb-2">
+                    ${note.tags.map(tag => `<span class="tag px-2 py-0.5 bg-white bg-opacity-50 rounded-full text-xs">#${tag}</span>`).join('')}
+                </div>
+                <div class="text-xs text-gray-500 mt-2">${formatDate(note.date)}</div>
+            `;
+            
+            noteCard.addEventListener('click', () => openNoteEditor(note.id));
+            notesGrid.appendChild(noteCard);
+        });
+    }
+
+    // Format date to a readable string
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    // Open note editor with a specific note
+    function openNoteEditor(noteId) {
+        const note = notes.find(n => n.id === noteId);
+        if (note) {
+            currentNoteId = noteId;
+            noteTitleInput.value = note.title;
+            noteContentEditor.innerHTML = note.content;
+            
+            // Update favorite button
+            if (note.isFavorite) {
+                favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
+                favoriteBtn.classList.add('text-yellow-500');
+                favoriteBtn.classList.remove('text-gray-500');
+            } else {
+                favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
+                favoriteBtn.classList.add('text-gray-500');
+                favoriteBtn.classList.remove('text-yellow-500');
+            }
+            
+            // Update tags
+            const tagsContainer = document.getElementById('note-tags');
+            tagsContainer.innerHTML = '';
+            
+            note.tags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'tag px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs cursor-pointer flex items-center';
+                tagElement.innerHTML = `#${tag} <i class="fas fa-times ml-1"></i>`;
+                tagsContainer.appendChild(tagElement);
+            });
+            
+            const addTagBtn = document.createElement('button');
+            addTagBtn.className = 'px-3 py-1 border border-dashed border-gray-300 rounded-full text-xs text-gray-500 hover:bg-gray-50';
+            addTagBtn.textContent = '+ Adicionar etiqueta';
+            tagsContainer.appendChild(addTagBtn);
+        } else {
+            // Create new note
+            currentNoteId = null;
+            noteTitleInput.value = '';
+            noteContentEditor.innerHTML = '';
+            favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
+            favoriteBtn.classList.add('text-gray-500');
+            favoriteBtn.classList.remove('text-yellow-500');
+            
+            // Reset tags
+            const tagsContainer = document.getElementById('note-tags');
+            tagsContainer.innerHTML = `
+                <button class="px-3 py-1 border border-dashed border-gray-300 rounded-full text-xs text-gray-500 hover:bg-gray-50">
+                    + Adicionar etiqueta
+                </button>
+            `;
+        }
+        
+        notesGrid.classList.add('hidden');
+        noteEditor.classList.remove('hidden');
+    }
+
+    // Save the current note
+    function saveNote() {
+        const title = noteTitleInput.value.trim() || 'Nota sem título';
+        const content = noteContentEditor.innerHTML;
+        const isFavorite = favoriteBtn.classList.contains('text-yellow-500');
+        
+        // Get tags
+        const tags = [];
+        document.querySelectorAll('#note-tags .tag').forEach(tag => {
+            const tagText = tag.textContent.trim().replace('#', '').replace('×', '');
+            if (tagText) tags.push(tagText);
+        });
+        
+        if (currentNoteId) {
+            // Update existing note
+            const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+            if (noteIndex !== -1) {
+                notes[noteIndex] = {
+                    ...notes[noteIndex],
+                    title,
+                    content,
+                    isFavorite,
+                    tags,
+                    date: new Date().toISOString().split('T')[0]
+                };
+            }
+        } else {
+            // Create new note
+            const newNote = {
+                id: Date.now(),
+                title,
+                content,
+                color: getRandomNoteColor(),
+                tags,
+                date: new Date().toISOString().split('T')[0],
+                isFavorite
+            };
+            notes.unshift(newNote);
+        }
+        
+        saveNotesToStorage();
+        closeNoteEditor();
+    }
+
+    // Close the note editor
+    function closeNoteEditor() {
+        noteEditor.classList.add('hidden');
+        notesGrid.classList.remove('hidden');
+        renderNotes();
+    }
+
+    // Delete the current note
+    function deleteNote() {
+        if (currentNoteId) {
+            notes = notes.filter(note => note.id !== currentNoteId);
+            saveNotesToStorage();
+            closeNoteEditor();
+        }
+    }
+
+    // Toggle favorite status
+    function toggleFavorite() {
+        if (favoriteBtn.classList.contains('text-gray-500')) {
+            favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
+            favoriteBtn.classList.remove('text-gray-500');
+            favoriteBtn.classList.add('text-yellow-500');
+        } else {
+            favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
+            favoriteBtn.classList.remove('text-yellow-500');
+            favoriteBtn.classList.add('text-gray-500');
+        }
+    }
+
+    // Get a random color for new notes
+    function getRandomNoteColor() {
+        const colors = ['bg-blue-50', 'bg-green-50', 'bg-yellow-50', 'bg-red-50', 'bg-purple-50', 'bg-pink-50'];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    // Toggle sidebar on mobile
+    function toggleSidebar() {
+        sidebar.classList.toggle('collapsed');
+    }
+
+    // Toggle view mode (grid/list)
+    function toggleViewMode() {
+        isGridView = !isGridView;
+        if (isGridView) {
+            viewToggleBtn.innerHTML = '<i class="fas fa-th-large"></i>';
+            notesGrid.classList.remove('flex', 'flex-col');
+            notesGrid.classList.add('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+        } else {
+            viewToggleBtn.innerHTML = '<i class="fas fa-list"></i>';
+            notesGrid.classList.remove('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+            notesGrid.classList.add('flex', 'flex-col', 'space-y-4');
+        }
+        renderNotes();
+    }
+
+    // Toggle sort order
+    function toggleSortOrder() {
+        if (sortOrder === 'newest') {
+            sortOrder = 'oldest';
+            notes.sort((a, b) => new Date(a.date) - new Date(b.date));
+        } else if (sortOrder === 'oldest') {
+            sortOrder = 'alphabetical';
+            notes.sort((a, b) => a.title.localeCompare(b.title));
+        } else {
+            sortOrder = 'newest';
+            notes.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        renderNotes();
+    }
+
+    // Setup rich text editor
+    function setupRichTextEditor() {
+        document.querySelectorAll('.toolbar button[data-command]').forEach(button => {
+            button.addEventListener('click', () => {
+                const command = button.dataset.command;
+                
+                if (command === 'createLink') {
+                    const url = prompt('Digite o URL do link:');
+                    if (url) document.execCommand(command, false, url);
+                } else {
+                    document.execCommand(command, false, null);
+                }
+                
+                noteContentEditor.focus();
+            });
+        });
+        
+        document.querySelectorAll('.toolbar select[data-command]').forEach(select => {
+            select.addEventListener('change', () => {
+                const command = select.dataset.command;
+                const value = select.value;
+                
+                document.execCommand(command, false, value);
+                noteContentEditor.focus();
+                select.selectedIndex = 0;
+            });
+        });
+    }
+
+    // Setup PWA functionality
+    function setupPWA() {
+        // Criar e injetar o manifesto dinamicamente
+        const manifestData = {
+            name: "NotaFácil - Aplicativo de Anotações",
+            short_name: "NotaFácil",
+            description: "Aplicativo de anotações com várias opções de organização e edição de texto",
+            start_url: "./",
+            display: "standalone",
+            background_color: "#ffffff",
+            theme_color: "#4f46e5",
+            icons: [
+                {
+                    src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSI1MCIgZmlsbD0iIzRmNDZlNSIvPjxwYXRoIGQ9Ik0zNjIgMTcwSDIzMGMtNi42IDAtMTItNS40LTEyLTEydi0xMmMwLTYuNiA1LjQtMTIgMTItMTJoMTMyYzYuNiAwIDEyIDUuNCAxMiAxMnYxMmMwIDYuNi01LjQgMTItMTIgMTJ6TTM2MiAyNTBIMTUwYy02LjYgMC0xMi01LjQtMTItMTJ2LTEyYzAtNi42IDUuNC0xMiAxMi0xMmgyMTJjNi42IDAgMTIgNS40IDEyIDEydjEyYzAgNi42LTUuNCAxMi0xMiAxMnpNMzYyIDMzMEgxNTBjLTYuNiAwLTEyLTUuNC0xMi0xMnYtMTJjMC02LjYgNS40LTEyIDEyLTEyaDIxMmM2LjYgMCAxMiA1LjQgMTIgMTJ2MTJjMCA2LjYtNS40IDEyLTEyIDEyeiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=",
+                    sizes: "512x512",
+                    type: "image/svg+xml",
+                    purpose: "any maskable"
+                }
+            ]
+        };
+        
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.querySelector('link[rel="manifest"]').setAttribute('href', manifestURL);
+        
+        // Registrar o Service Worker
+        if ('serviceWorker' in navigator) {
+            // Criar um service worker simples dinamicamente
+            const swCode = `
+                const CACHE_NAME = 'notafacil-v1';
+                const urlsToCache = [
+                    './',
+                    './index.html',
+                    'https://cdn.tailwindcss.com',
+                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+                    'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'
+                ];
+
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.addAll(urlsToCache))
+                    );
+                });
+
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => response || fetch(event.request))
+                    );
+                });
+            `;
+            
+            const swBlob = new Blob([swCode], {type: 'text/javascript'});
+            const swURL = URL.createObjectURL(swBlob);
+            
+            navigator.serviceWorker.register(swURL)
+                .then(reg => console.log('Service Worker registrado com sucesso:', reg))
+                .catch(err => console.error('Erro ao registrar Service Worker:', err));
+        }
+        
+        // Configurar o evento de instalação do PWA
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.style.display = 'flex';
+        });
+        
+        installButton.addEventListener('click', () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Usuário aceitou a instalação do PWA');
+                        installButton.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        });
+        
+        window.addEventListener('appinstalled', () => {
+            installButton.style.display = 'none';
+            deferredPrompt = null;
+            console.log('PWA instalado com sucesso');
+        });
+    }
+
+    // Setup all event listeners
+    function setupEventListeners() {
+        newNoteBtn.addEventListener('click', () => openNoteEditor(null));
+        saveNoteBtn.addEventListener('click', saveNote);
+        cancelEditBtn.addEventListener('click', closeNoteEditor);
+        deleteBtn.addEventListener('click', deleteNote);
+        favoriteBtn.addEventListener('click', toggleFavorite);
+        mobileSidebarToggle.addEventListener('click', toggleSidebar);
+        document.getElementById('toggle-sidebar').addEventListener('click', toggleSidebar);
+        viewToggleBtn.addEventListener('click', toggleViewMode);
+        sortButton.addEventListener('click', toggleSortOrder);
+        
+        setupRichTextEditor();
+    }
+
+    // Initialize the app when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', init);
+</script>
